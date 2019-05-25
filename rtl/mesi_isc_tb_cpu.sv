@@ -1,6 +1,6 @@
 /********************************************************************************
 *
-* Authors: Srijana Sapkota and Zeba Khan Rafi
+* Authors: Vinitha Baddam, Monika Sinduja Mullapudi, Zerin Fatima
 * Reference: https://github.com/PrakashLuu/mesi_verification
 * Reference: https://github.com/shruti2611/EE382M_project/blob/master/mesi_fifo/mesi_isc_define.v
 * Reference: https://github.com/rdsalemi/uvmprimer/tree/master/16_Analysis_Ports_In_the_Testbench
@@ -613,4 +613,3 @@ always @(posedge clk or posedge rst)
    endcase 
 
 endmodule
-
