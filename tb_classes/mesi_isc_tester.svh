@@ -1,6 +1,6 @@
 /********************************************************************************
 *
-* Authors: Srijana Sapkota and Zeba Khan Rafi
+* Authors: Vinitha Baddam, Monika Sinduja Mullapudi, Zerin Fatima
 * Reference: https://github.com/PrakashLuu/mesi_verification
 * Reference: https://github.com/shruti2611/EE382M_project/blob/master/mesi_fifo/mesi_isc_define.v
 * Reference: https://github.com/rdsalemi/uvmprimer/tree/master/16_Analysis_Ports_In_the_Testbench
@@ -11,43 +11,31 @@
 * Srijana Sapkota	3/8/2019	Errors faced using uvm_macros. Commented for this version.
 * Srijana Sapkota	3/10/2019	Fixed, include macros worked. 
 ********************************************************************************/
-import uvm_pkg::*;
-`include "uvm_macros.svh"
 import mesi_isc_pkg::*;
 
 `include "mesi_isc_pkg.sv"
 
-class tester extends uvm_component;
-	`uvm_component_utils(tester);
-	
-	virtual mesi_isc_bfm bfm; 
-	
-	// The following is aport for tester'd FIFO
-	
-	uvm_put_port #(cpu_ip_s) cpu_ip_port;			 			
+class tester; 
+	virtual mesi_isc_bfm bfm;
+
+	function new (virtual mesi_isc_bfm b);
+		bfm = b;
+	endfunction : new		 			
 	
 	//internal variables 
-	logic [3:0]   mbus_ack_memory;
-	logic [31:0]  mem[9:0];  	//main memory								
+	logic [3:0] mbus_ack_memory;
+	logic [31:0] mem[9:0];  	//main memory								
 	logic [3:0] tb_ins_nop_period;
 	cpu_ip_s cpu_ip;
-
-	function new (string name, uvm_component parent);
-      super.new(name, parent);
-    endfunction
 	
-    function void build_phase(uvm_phase phase);
-		cpu_ip_port = new("cpu_ip_port", this);
-	endfunction : build_phase
-   
-	function reset_op();
+	protected function void reset_op();
 		cpu_ip.reset = 1;
-		cpu_ip.tb_ins_array      = `MESI_ISC_TB_INS_NOP;		                                                              
+		cpu_ip.tb_ins_array = `MESI_ISC_TB_INS_NOP;		                                                              
 		cpu_ip.tb_ins_addr_array = 0;
 		tb_ins_nop_period = 4'b0;								
 	endfunction
 	
-	function void gen_stimulus();
+	protected function void gen_stimulus();
 		integer  		cur_stimulus_cpu,m,l;
 		integer                 stimulus_rand_numb [9:0];
 		integer                 seed;
@@ -110,7 +98,7 @@ class tester extends uvm_component;
 	
 	endfunction
 	
-	function void gen_stimulus_matrix();
+	/*protected function void gen_stimulus_matrix();
 		reg	mem_access;
 		reg [1:0]  cpu_priority;
 		logic i;
@@ -143,29 +131,28 @@ class tester extends uvm_component;
 									cpu_ip.mbus_data_rd =  mem[bfm.mbus_addr_array[cpu_priority+i]];		   
 						end
 			end
-	endfunction
+	endfunction*/
 		
-	task run_phase(uvm_phase phase);
-		  
-		  phase.raise_objection(this);
-		  						//reset command 
-		  reset_op(); 								    //generates stimulus for reset 
-			
-			cpu_ip_port.put(cpu_ip);			//put it into the fifo for the driver to pull it 
-		  repeat (1000) begin : random_loop
-			//assign cpu_ip by calling the tasks 
-			 gen_stimulus;			   			    //generates stimulus and ssigns it to the structure 
-			 //gen_stimulus_matrix;					//generates stimului for matrix and memory 
-			 
-			 //send_command(cpu_ip);		//calls the bfm task which puts the command into the fifo 
-			 cpu_ip_port.put(cpu_ip);								//put it into the fifo for the driver to pull it 
-		  end : random_loop
-		  #500;
-		  phase.drop_objection(this);
-	endtask : run_phase
+	task execute();
+		//reset command 
+		reset_op();			//generates stimulus for reset 
 
-task assign_mbus_ack();
-	cpu_ip.mbus_ack = mbus_ack_memory[3:0] | bfm.mbus_ack_mesi_isc[3:0];
-endtask: assign_mbus_ack
+		bfm.send_ip_cpu(cpu_ip);		//put it into the fifo for the driver to pull it 
+		repeat (1000) begin : random_loop
+			//assign cpu_ip by calling the tasks 
+			gen_stimulus;			   	//generates stimulus and ssigns it to the structure 
+			//gen_stimulus_matrix;		//generates stimului for matrix and memory 
+
+			//send_command(cpu_ip);		//calls the bfm task which puts the command into the fifo 
+			bfm.send_ip_cpu(cpu_ip);	//put it into the fifo for the driver to pull it 
+		end : random_loop
+		#500;
+		$stop;
+	endtask : execute
+
+	task assign_mbus_ack();
+		cpu_ip.mbus_ack = mbus_ack_memory[3:0] | bfm.mbus_ack_mesi_isc[3:0];
+	endtask: assign_mbus_ack
+
 	
 endclass: tester 
