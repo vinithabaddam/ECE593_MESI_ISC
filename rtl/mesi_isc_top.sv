@@ -1,7 +1,7 @@
 /********************************************************************************
 /********************************************************************************
 *
-* Authors: Srijana Sapkota and Zeba Khan Rafi
+* Authors: Vinitha Baddam, Monika Sinduja Mullapudi, Zerin Fatima
 * Reference: https://github.com/PrakashLuu/mesi_verification
 * Reference: https://github.com/shruti2611/EE382M_project/blob/master/mesi_fifo/mesi_isc_define.v
 * Reference: https://github.com/rdsalemi/uvmprimer/tree/master/16_Analysis_Ports_In_the_Testbench
@@ -12,17 +12,15 @@
 ********************************Change Log******************************************************* 
 * Srijana & Zeba	3/3/2019	Created top level module
 ********************************************************************************/
+`include "testbench.svh"
 
 module top;
 
-
-import mesi_isc_pkg::*;
-import uvm_pkg::*;
-
-		   
-   mesi_isc_bfm  bfm();
-   command_monitor cmd_monitor;
-   //cpu instantiations
+	import mesi_isc_pkg::*;
+	   
+	
+	//command_monitor cmd_monitor;
+   	//cpu instantiations
 	mesi_isc_tb_cpu mesi_isc_tb_cpu3 
 		(
 		 .clk(bfm.clk),.rst(bfm.rst), 
@@ -76,11 +74,12 @@ import uvm_pkg::*;
 				 .cbus_cmd0_o(cbus_cmd0),.mbus_ack3_o(bfm.mbus_ack_mesi_isc[3]),.mbus_ack2_o(bfm.mbus_ack_mesi_isc[2]),
 				 .mbus_ack1_o(bfm.mbus_ack_mesi_isc[1]),.mbus_ack0_o(bfm.mbus_ack_mesi_isc[0])
                 ); */
-
-	initial 
-		begin
-		   uvm_config_db #(virtual mesi_isc_bfm)::set(null, "*", "bfm", bfm);
-		   run_test();
-		end
+	mesi_isc_bfm  bfm();
+	testbench    testbench_h;
+	
+	initial begin
+		testbench_h = new(bfm);
+		testbench_h.execute();
+	end
 
 endmodule : top

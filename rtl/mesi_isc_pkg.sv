@@ -15,7 +15,6 @@
 
 
 package mesi_isc_pkg;
-  import uvm_pkg::*;
  
 	 //parameters 
 	parameter	CBUS_CMD_WIDTH           = 3;
@@ -119,17 +118,16 @@ package mesi_isc_pkg;
 					logic 						mbus_ack0_o;
 				  } tired;
 
-//`include "mesi_isc_coverage.svh"
-//`include "mesi_isc_tester.svh"
+/*`include "mesi_isc_coverage.svh"
+`include "mesi_isc_tester.svh"
 
-//`inlcude "mesi_isc_scoreboard.svh"
+`inlcude "mesi_isc_scoreboard.svh"
 
 `include "mesi_isc_command_monitor.svh"
 
-
+*/
 
 endpackage : mesi_isc_pkg
-
 
 
 

@@ -13,11 +13,15 @@
 ********************************************************************************/
 `timescale 1ns / 1ps
 
+`include "mesi_isc_command_monitor.svh"
+`include "mesi_isc_result_monitor.svh"
+
 interface mesi_isc_bfm;
+
 	import mesi_isc_pkg::*;		
 
-command_monitor command_monitor_h;	
-//result_monitor  result_monitor_h();				  
+	command_monitor command_monitor_h;	
+	result_monitor  result_monitor_h;				  
 	
 	//INPUT ports of the design 
 	bit clk;
@@ -158,11 +162,11 @@ command_monitor command_monitor_h;
 			command_monitor_h.write_to_monitor(inport);								//write into the analysis port 
 		end : command_monitor_p 
 	
-	/*
+	tired outport;
 	//writing into result monitor port 
 	always @(cbus_addr)
 		begin: result_monitor_1 
-			tired outport;
+			//tired outport;
 			
 			@(negedge clk);
 			@(negedge clk);
@@ -174,7 +178,7 @@ command_monitor command_monitor_h;
 			assign_outport(outport);									//assign the output values to struct
 			result_monitor_h.write_to_monitor(outport);					//write into result analysis port
 
-		end: result_monitor_1  */
+		end: result_monitor_1  
 
 	//task being called in the above task 
 	task assign_outport(input tired outport);
