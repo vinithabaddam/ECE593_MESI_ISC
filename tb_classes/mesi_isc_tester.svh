@@ -19,7 +19,7 @@ class tester;
 	
 	//internal variables 
 	logic [3:0] mbus_ack_memory;
-	logic [31:0] mem[9:0];  	//main memory								
+	logic [31:0] mem[9:0];  //main memory								
 	logic [3:0] tb_ins_nop_period;
 	cpu_input cpu_ip;
 	
@@ -47,20 +47,19 @@ class tester;
 			stimulus_rand_numb[m] = $random(seed);
 
 			// For the current cycle check all the CPU starting in a random CPU ID 
-			stimulus_rand_cpu_select = $unsigned(stimulus_rand_numb[0]) % 4; // The
-																			 // random CPU ID
+			stimulus_rand_cpu_select = $unsigned(stimulus_rand_numb[0]) % 4; // The random CPU ID
 		for (l = 0; l < 4; l = l + 1)
 			begin
 				  // Start generate a request of CPU ID that equal to cur_stimulus_cpu
 				  cur_stimulus_cpu = (stimulus_rand_cpu_select+l) % 4; 
 				  //cur_stimulus_cpu=0;
-				  cpu_ip.cpu_id = cur_stimulus_cpu;									//assign it to the structure defined in package
+				  cpu_ip.cpu_id = cur_stimulus_cpu;			//assign it to the structure defined in package
 				  //give it to cpu id 
 				  // This CPU is in NOP period
 				  // ----------------------------
 				  //DOUBT: should we use the structure one?
 				 // if(0)
-				  if(tb_ins_nop_period[cur_stimulus_cpu] > 0)  						//checking if NOP is required for the current one
+				  if(tb_ins_nop_period[cur_stimulus_cpu] > 0)  		//checking if NOP is required for the current one
 					  begin
 							cpu_ip.tb_ins_array[cur_stimulus_cpu] = `MESI_ISC_TB_INS_NOP;
 							// Decrease the counter by 1. When the counter value is 0 the NOP period is finished
@@ -68,7 +67,7 @@ class tester;
 					  end
 				  // After last action's ACK from cpu, instruction changed back to nop.
 				 else if (tb_ins_ack_pkg[cur_stimulus_cpu] == 1 )								       		  //when NOP is not required //checking the master's ack bus//defined in the package  
-							cpu_ip.tb_ins_array[cur_stimulus_cpu] = `MESI_ISC_TB_INS_NOP;  	              		  //if there is an acknowledgement means an inst has been completed       
+							cpu_ip.tb_ins_array[cur_stimulus_cpu] = `MESI_ISC_TB_INS_NOP;	   //if there is an acknowledgement means an inst has been completed       
 				           
 				  // Generate the next instruction for the CPU 
 				  else if(tb_ins_array_pkg[cur_stimulus_cpu] == `MESI_ISC_TB_INS_NOP)         		  //if no acknowledgement, inst array is checked
@@ -83,7 +82,7 @@ class tester;
 							stimulus_nop_period = ($unsigned(stimulus_rand_numb[9]) % 10) + 1 ;   //random nop period
 							// Next op is nop. Set the value of the counter
 							if (stimulus_op == 0)
-								tb_ins_nop_period[cur_stimulus_cpu] = stimulus_nop_period;		  //NOP operation period
+								tb_ins_nop_period[cur_stimulus_cpu] = stimulus_nop_period;    //NOP operation period
 							else
 								begin
 									  cpu_ip.tb_ins_array[cur_stimulus_cpu] = stimulus_op; // 1 for wr, 2 for rd
@@ -133,16 +132,15 @@ class tester;
 		//reset command 
 		reset_op();			//generates stimulus for reset 
 
-		bfm.send_ip_cpu(cpu_ip);		//put it into the fifo for the driver to pull it 
+		bfm.send_ip_cpu(cpu_ip);		//send it to bfm
 		repeat (10) begin : random_loop
 			//assign cpu_ip by calling the tasks 
 			gen_stimulus;			   	//generates stimulus and ssigns it to the structure 
 			//gen_stimulus_matrix;		//generates stimului for matrix and memory 
-
-			//send_command(cpu_ip);		//calls the bfm task which puts the command into the fifo 
+ 
 			$display("cpu_id = %d, reset = %b, mbus_data_rd = %d, mbus_ack=%d, tb_ins_array=%d, tb_ins_addr_array=%d\n",
 				cpu_ip.cpu_id, cpu_ip.reset, cpu_ip.mbus_data_rd, cpu_ip.mbus_ack,cpu_ip.tb_ins_array,cpu_ip.tb_ins_addr_array);
-			bfm.send_ip_cpu(cpu_ip);	//put it into the fifo for the driver to pull it 
+			bfm.send_ip_cpu(cpu_ip);	//send it to bfm
 		end : random_loop
 		#50;
 		$stop;
