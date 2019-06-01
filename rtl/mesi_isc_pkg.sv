@@ -98,7 +98,7 @@ package mesi_isc_pkg;
 				logic 				cbus_ack0_i;
       				} input_port;
 				  
-	typedef struct{ // Outputs
+	typedef struct{ // outputs
 				logic [ADDR_WIDTH-1:0] 		cbus_addr_o;
 				logic [CBUS_CMD_WIDTH-1:0] 	cbus_cmd3_o;
 				logic [CBUS_CMD_WIDTH-1:0] 	cbus_cmd2_o;

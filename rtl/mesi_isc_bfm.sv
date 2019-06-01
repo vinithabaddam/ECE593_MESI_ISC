@@ -25,25 +25,25 @@ interface mesi_isc_bfm;
 	bit rst = 0;
 	
 	//INPUTS TO CPU <not coming from the design outputs>
-	logic   [DATA_WIDTH-1:0] mbus_data_rd;  		// Main bus data read
-	logic   [3:0]            mbus_ack;  	 		// Main bus3 acknowledge
+	logic   [DATA_WIDTH-1:0] mbus_data_rd;  		  // Main bus data read
+	logic   [3:0]            mbus_ack;  	 		  // Main bus3 acknowledge
 	logic   [3:0]            tb_ins_array [3:0];
 	logic   [3:0]            tb_ins_addr_array [3:0];
 	
 	//OUTPUTS from CPU <not given to design>
-	logic   [DATA_WIDTH-1:0] mbus_data_wr_array [3:0];  // Main bus data read
-    logic   [3:0]            tb_ins_ack;
+	logic   [DATA_WIDTH-1:0] mbus_data_wr_array [3:0];  	  // Main bus data read
+    	logic   [3:0]            tb_ins_ack;
 	//OUTPUTS from CPU <also given to design as inputs>
 	logic                    cbus_ack3;  			  // Coherence bus3 acknowledge
 	logic                    cbus_ack2;  			  // Coherence bus2 acknowledge
 	logic                    cbus_ack1;  			  // Coherence bus1 acknowledge
 	logic                    cbus_ack0;  			  // Coherence bus0 acknowledge
-	logic  [MBUS_CMD_WIDTH-1:0] mbus_cmd_array [3:0];   // Main bus3 command
-	logic  [ADDR_WIDTH-1:0]     mbus_addr_array [3:0];   // Main bus3 address
+	logic  [MBUS_CMD_WIDTH-1:0] mbus_cmd_array [3:0];   	  // Main bus3 command
+	logic  [ADDR_WIDTH-1:0]     mbus_addr_array [3:0];   	  // Main bus3 address
 	
 	//OUTPUT ports of the design <also inptus to CPU>
 	logic   [ADDR_WIDTH-1:0] cbus_addr;  			  // Coherence bus address. All busses have
-													  // the same address
+													  
 	logic   [CBUS_CMD_WIDTH-1:0] cbus_cmd3; 		  // Coherence bus3 command//initializing with NOP cimmans
 	logic   [CBUS_CMD_WIDTH-1:0] cbus_cmd2; 		  // Coherence bus2 command
 	logic   [CBUS_CMD_WIDTH-1:0] cbus_cmd1; 		  // Coherence bus1 command
@@ -51,8 +51,8 @@ interface mesi_isc_bfm;
 	logic   [3:0]            mbus_ack_mesi_isc;		  //master acknowledge bus 
 	
 	//DEBUG
-	logic   [ADDR_WIDTH-1:0] cbus_addr_cpu;  			  // Coherence bus address. All busses have
-														// the same address
+	logic   [ADDR_WIDTH-1:0] cbus_addr_cpu;  		  // Coherence bus address. All busses have
+														
 	logic   [CBUS_CMD_WIDTH-1:0] cbus_cmd3_cpu; 		  // Coherence bus3 command//initializing with NOP cimmans
 	logic   [CBUS_CMD_WIDTH-1:0] cbus_cmd2_cpu; 		  // Coherence bus2 command
 	logic   [CBUS_CMD_WIDTH-1:0] cbus_cmd1_cpu; 		  // Coherence bus1 command
@@ -104,14 +104,13 @@ interface mesi_isc_bfm;
 	
 	task assign_ip(input cpu_input cpu_ip);
 			//inputs to CPU 
-
 		mbus_data_rd = cpu_ip.mbus_data_rd;
 		mbus_ack[cpu_ip.cpu_id] = cpu_ip.mbus_ack;
 		tb_ins_array[cpu_ip.cpu_id] = cpu_ip.tb_ins_array;
 		tb_ins_addr_array[cpu_ip.cpu_id] = cpu_ip.tb_ins_addr_array;
 	endtask
 	
-	//send INPUT to cpu3 
+	//send INPUT to cpu 
 	task send_ip_cpu(input cpu_input cpu_ip);
 		
 		$display("cpu id = %d\n",cpu_ip.cpu_id);
@@ -119,21 +118,21 @@ interface mesi_isc_bfm;
 		@(posedge clk);
 		if(cpu_ip.reset)
 			begin 
-				rst = 1;									//reset operation //will go to both design and cpu 
+				rst = 1;			//reset operation //will go to both design and cpu 
 				//inputs for reset 
-				assign_ip(cpu_ip);							//assigning the inputs to cpu 
+				assign_ip(cpu_ip);	 	//assigning the inputs to cpu 
 				repeat (10) @(negedge clk);
 				rst = 0;	
 			end 
 		else 
 			begin 
-				assign_ip(cpu_ip);							//assigining inputs to cpu 
+				assign_ip(cpu_ip);		//assigining inputs to cpu 
 			end
 	endtask: send_ip_cpu 
 	
 	
 	input_port inport;
-	//writing into the command monitor port
+	//writing to the command monitor
 	always @(posedge mbus_ack[3] or posedge mbus_ack[2] or posedge mbus_ack[1] or posedge mbus_ack[0])
 		begin : command_monitor_p
 			//static bit in_command = 0;
@@ -156,24 +155,24 @@ interface mesi_isc_bfm;
 			inport.cbus_ack1_i = cbus_ack1;
 			inport.cbus_ack0_i = cbus_ack0;
 			
-			command_monitor_h.write_to_monitor(inport);								//write into the analysis port 
+			command_monitor_h.write_to_monitor(inport);		//write to the command monitor 
 		end : command_monitor_p 
 	
 	output_port outport;
-	//writing into result monitor port 
+	//writing to result monitor
 	always @(cbus_addr)
 		begin: result_monitor_1 
 			//tired outport;
 			
 			@(negedge clk);
 			@(negedge clk);
-			assign_outport(outport);									//assign the output values to struct
-			result_monitor_h.write_to_monitor(outport);					//write into result analysis port
+			assign_outport(outport);				//assign the output values to struct
+			result_monitor_h.write_to_monitor(outport);		//write to result monitor
 			
 			@(negedge cbus_ack3 or negedge cbus_ack2 or negedge cbus_ack1 or negedge cbus_ack0);
 			@(negedge clk);
-			assign_outport(outport);									//assign the output values to struct
-			result_monitor_h.write_to_monitor(outport);					//write into result analysis port
+			assign_outport(outport);				//assign the output values to struct
+			result_monitor_h.write_to_monitor(outport);		//write to result monitor
 
 		end: result_monitor_1  
 
