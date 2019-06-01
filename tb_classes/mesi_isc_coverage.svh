@@ -4,7 +4,6 @@
 * Date: 5/31/2019
 *
 * Description:	This class checks stimulus coverage. 
-*		Command monitor provides inport port through bfm.
 *
 ********************************************************************************/
 
