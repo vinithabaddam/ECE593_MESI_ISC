@@ -1,18 +1,13 @@
 /********************************************************************************
 *
 * Authors: Vinitha Baddam, Monika Sinduja Mullapudi, Zerin Fatima
-* Reference: https://github.com/PrakashLuu/mesi_verification
-* Reference: https://github.com/shruti2611/EE382M_project/blob/master/mesi_fifo/mesi_isc_define.v
-* Reference: https://github.com/rdsalemi/uvmprimer/tree/master/16_Analysis_Ports_In_the_Testbench
-* Reference: https://opencores.org/projects/mesi_isc
+* Date: 5/31/2019
 *
-* Description:	This tester class provides commands to the master by using FIFO.
-********************************Change Log******************************************************* 
-* Srijana Sapkota	3/8/2019	Errors faced using uvm_macros. Commented for this version.
-* Srijana Sapkota	3/10/2019	Fixed, include macros worked. 
-********************************************************************************/
-import mesi_isc_pkg::*;
+* Description:	This tester class provides commands to the design through bfm
+*
+*********************************************************************************/
 
+import mesi_isc_pkg::*;
 `include "mesi_isc_pkg.sv"
 
 class tester; 
@@ -26,7 +21,7 @@ class tester;
 	logic [3:0] mbus_ack_memory;
 	logic [31:0] mem[9:0];  	//main memory								
 	logic [3:0] tb_ins_nop_period;
-	cpu_ip_s cpu_ip;
+	cpu_input cpu_ip;
 	
 	protected function void reset_op();
 		cpu_ip.reset = 1;
@@ -47,6 +42,7 @@ class tester;
 		
 		// Calculate the random numbers for this cycle. Use one $random command
 		// to perform one series of random number depends on the seed.
+		cpu_ip.reset = 0;
 		for (m = 0; m < 9; m = m + 1)
 			stimulus_rand_numb[m] = $random(seed);
 
@@ -131,28 +127,30 @@ class tester;
 									cpu_ip.mbus_data_rd =  mem[bfm.mbus_addr_array[cpu_priority+i]];		   
 						end
 			end
-	endfunction*/
-		
+	endfunction
+	*/	
 	task execute();
 		//reset command 
 		reset_op();			//generates stimulus for reset 
 
 		bfm.send_ip_cpu(cpu_ip);		//put it into the fifo for the driver to pull it 
-		repeat (1000) begin : random_loop
+		repeat (10) begin : random_loop
 			//assign cpu_ip by calling the tasks 
 			gen_stimulus;			   	//generates stimulus and ssigns it to the structure 
 			//gen_stimulus_matrix;		//generates stimului for matrix and memory 
 
 			//send_command(cpu_ip);		//calls the bfm task which puts the command into the fifo 
+			$display("cpu_id = %d, reset = %b, mbus_data_rd = %d, mbus_ack=%d, tb_ins_array=%d, tb_ins_addr_array=%d\n",
+				cpu_ip.cpu_id, cpu_ip.reset, cpu_ip.mbus_data_rd, cpu_ip.mbus_ack,cpu_ip.tb_ins_array,cpu_ip.tb_ins_addr_array);
 			bfm.send_ip_cpu(cpu_ip);	//put it into the fifo for the driver to pull it 
 		end : random_loop
-		#500;
+		#50;
 		$stop;
 	endtask : execute
-
+	/*
 	task assign_mbus_ack();
 		cpu_ip.mbus_ack = mbus_ack_memory[3:0] | bfm.mbus_ack_mesi_isc[3:0];
 	endtask: assign_mbus_ack
-
+	*/
 	
 endclass: tester 

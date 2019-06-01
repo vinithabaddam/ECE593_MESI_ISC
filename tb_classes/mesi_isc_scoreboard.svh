@@ -1,18 +1,11 @@
 /********************************************************************************
 *
 * Authors: Vinitha Baddam, Monika Sinduja Mullapudi, Zerin Fatima
-* Reference: https://github.com/PrakashLuu/mesi_verification
-* Reference: https://github.com/shruti2611/EE382M_project/blob/master/mesi_fifo/mesi_isc_define.v
-* Reference: https://github.com/rdsalemi/uvmprimer/tree/master/16_Analysis_Ports_In_the_Testbench
-* Reference: https://opencores.org/projects/mesi_isc
-* Last Modified: March 12, 2019
+* Date: 5/31/2019
 *
 * Description:	Scoreboard uses self-checking mechanism to check if MESI coherency protocol is 
-*				followed by 4 CPUs and the master. 
-*				Inputs: From Command monitor thorugh the FIFO
-*				Outputs: From Result Monitor through the Analysis port
-********************************Change Log******************************************************* 
-* Srijana S. and Zeba K. R.			3/12/2019			Created
+*		followed by 4 CPUs and the master. 
+*
 ********************************************************************************/
 
 
@@ -25,83 +18,49 @@ class scoreboard;
 	function new (virtual mesi_isc_bfm b);
 		bfm = b;
 	endfunction : new
-/*
-function new (string name, uvm_component parent);
-	super.new(name, parent);
-endfunction: new
 
-function void build_phase(uvm_phase phase);				// accepts input struct and sends commands
-	command_fifo = new("command_fifo", this);			// into the testbench
-endfunction: build_phase
-*/
-  //function void write(tired t);							// write method for the output struct 
+  	//score board execute task						
 	task execute();
-		input_ports inputs_sb;	
-		tired t;							// declaring inputs using input struct
-		inputs_sb = bfm.inport;
-		t = bfm.outport;
-    /*do
-	if (!command_fifo.try_get(inputs_sb))				// try_get reads commands out of the FIFO
-		$fatal(1, "Missing Some Input");				// throw a fatal exception if the try_get
-   /* while((((inputs_sb.mbus_cmd3_i)||					// method returns an empty FIFO
-           	(inputs_sb.mbus_cmd2_i)||
-            (inputs_sb.mbus_cmd1_i)||
-            (inputs_sb.mbus_cmd0_i))==`MESI_ISC_MBUS_CMD_NOP)||	// for when cmd maybe NOP
-          (((inputs_sb.mbus_cmd3_i)||
-            (inputs_sb.mbus_cmd2_i)||
-            (inputs_sb.mbus_cmd1_i)||
-            (inputs_sb.mbus_cmd0_i))==`MESI_ISC_MBUS_CMD_WR_BROAD)||	// when cmd maybe write broadcast
-          (((inputs_sb.mbus_cmd3_i)||
-            (inputs_sb.mbus_cmd2_i)||
-            (inputs_sb.mbus_cmd1_i)||
-            (inputs_sb.mbus_cmd0_i))==`MESI_ISC_MBUS_CMD_RD_BROAD)|| 	// when cmd maybe read broadcast
-		  (((inputs_sb.mbus_cmd3_i)||
-            (inputs_sb.mbus_cmd2_i)||
-            (inputs_sb.mbus_cmd1_i)||
-            (inputs_sb.mbus_cmd0_i))==`MESI_ISC_MBUS_CMD_WR)||			// when cmd maybe write
-		  (((inputs_sb.mbus_cmd3_i)||
-            (inputs_sb.mbus_cmd2_i)||
-            (inputs_sb.mbus_cmd1_i)||
-            (inputs_sb.mbus_cmd0_i))==`MESI_ISC_MBUS_CMD_WR));			// when cmd maybe read 
-			
-		*/	
-			
+		input_port input_sb;	// declaring score board inputs using input struct
+		output_port output_tb;	// declaring design outputs using output struct						
+		input_sb = bfm.inport;							
+		output_tb = bfm.outport;
     
 		fork
-			if((inputs_sb.mbus_cmd3_i != `MESI_ISC_MBUS_CMD_NOP) &&			// If master 3 is active and not NOP
-			 (inputs_sb.mbus_cmd2_i == `MESI_ISC_MBUS_CMD_NOP) &&			// Call self-checker task for Master 3 
-			 (inputs_sb.mbus_cmd1_i == `MESI_ISC_MBUS_CMD_NOP) &&
-			 (inputs_sb.mbus_cmd0_i == `MESI_ISC_MBUS_CMD_NOP)) begin
-				master3(inputs_sb, t);
+			if((input_sb.mbus_cmd3_i != `MESI_ISC_MBUS_CMD_NOP) &&			// If master 3 is active and not NOP
+			 (input_sb.mbus_cmd2_i == `MESI_ISC_MBUS_CMD_NOP) &&			// Call self-checker task for Master 3 
+			 (input_sb.mbus_cmd1_i == `MESI_ISC_MBUS_CMD_NOP) &&
+			 (input_sb.mbus_cmd0_i == `MESI_ISC_MBUS_CMD_NOP)) begin
+				master3(input_sb, output_tb);
 			end
 
-			else if((inputs_sb.mbus_cmd2_i != `MESI_ISC_MBUS_CMD_NOP) &&		// If master 3 is active and not NOP
-				  (inputs_sb.mbus_cmd3_i == `MESI_ISC_MBUS_CMD_NOP) &&		// Call self-checker task for Master 2
-				  (inputs_sb.mbus_cmd1_i == `MESI_ISC_MBUS_CMD_NOP) &&
-				  (inputs_sb.mbus_cmd0_i == `MESI_ISC_MBUS_CMD_NOP)) begin
-				master2(inputs_sb, t); 
+			else if((input_sb.mbus_cmd2_i != `MESI_ISC_MBUS_CMD_NOP) &&		// If master 3 is active and not NOP
+				  (input_sb.mbus_cmd3_i == `MESI_ISC_MBUS_CMD_NOP) &&		// Call self-checker task for Master 2
+				  (input_sb.mbus_cmd1_i == `MESI_ISC_MBUS_CMD_NOP) &&
+				  (input_sb.mbus_cmd0_i == `MESI_ISC_MBUS_CMD_NOP)) begin
+				master2(input_sb, output_tb); 
 			end
 
-			else if((inputs_sb.mbus_cmd1_i != `MESI_ISC_MBUS_CMD_NOP) &&		// If master 3 is active and not NOP
-				  (inputs_sb.mbus_cmd3_i == `MESI_ISC_MBUS_CMD_NOP) &&		// Call self-checker task for Master 1 
-				  (inputs_sb.mbus_cmd2_i == `MESI_ISC_MBUS_CMD_NOP) &&
-				  (inputs_sb.mbus_cmd0_i == `MESI_ISC_MBUS_CMD_NOP)) begin
-				master1(inputs_sb, t);
+			else if((input_sb.mbus_cmd1_i != `MESI_ISC_MBUS_CMD_NOP) &&		// If master 3 is active and not NOP
+				  (input_sb.mbus_cmd3_i == `MESI_ISC_MBUS_CMD_NOP) &&		// Call self-checker task for Master 1 
+				  (input_sb.mbus_cmd2_i == `MESI_ISC_MBUS_CMD_NOP) &&
+				  (input_sb.mbus_cmd0_i == `MESI_ISC_MBUS_CMD_NOP)) begin
+				master1(input_sb, output_tb);
 			end
 
-			else if((inputs_sb.mbus_cmd0_i != `MESI_ISC_MBUS_CMD_NOP) &&		// If master 3 is active and not NOP
-				  (inputs_sb.mbus_cmd3_i == `MESI_ISC_MBUS_CMD_NOP) &&		// Call self-checker task for Master 0
-				  (inputs_sb.mbus_cmd2_i == `MESI_ISC_MBUS_CMD_NOP) &&
-				  (inputs_sb.mbus_cmd1_i == `MESI_ISC_MBUS_CMD_NOP)) begin
-				master0(inputs_sb, t); 
+			else if((input_sb.mbus_cmd0_i != `MESI_ISC_MBUS_CMD_NOP) &&		// If master 3 is active and not NOP
+				  (input_sb.mbus_cmd3_i == `MESI_ISC_MBUS_CMD_NOP) &&		// Call self-checker task for Master 0
+				  (input_sb.mbus_cmd2_i == `MESI_ISC_MBUS_CMD_NOP) &&
+				  (input_sb.mbus_cmd1_i == `MESI_ISC_MBUS_CMD_NOP)) begin
+				master0(input_sb, output_tb); 
 			end
 		join_none
     
 	endtask : execute
     
 /********************************** Task for Master 3 ******************************/        
-    task master3(input_ports inputs_tk, tired outputs_tk); 		// Self checker task for Master 3
-		tired predicted;
+    task master3(input_port inputs_tk, output_port outputs_tk); 		// Self checker task for Master 3
+		output_port predicted;
 		forever begin: self_checker_master3
 		@(posedge bfm.clk) 
 		begin
@@ -168,8 +127,8 @@ endfunction: build_phase
     endtask: master3
  
 /********************************** Task for Master 2 ******************************/       
-     task master2(input_ports inputs_tk, tired outputs_tk);		// Self checker task for Master 2
-		tired predicted;
+     task master2(input_port inputs_tk, output_port outputs_tk);		// Self checker task for Master 2
+		output_port predicted;
         forever begin: self_checker_master2
         @(posedge bfm.clk) 
 		begin
@@ -236,8 +195,8 @@ endfunction: build_phase
      endtask: master2
         
 /********************************** Task for Master 1 ******************************/         
-    task master1(input_ports inputs_tk, tired outputs_tk);		// Self checker task for Master 1
-		tired predicted;
+    task master1(input_port inputs_tk, output_port outputs_tk);		// Self checker task for Master 1
+		output_port predicted;
 		forever begin: self_checker_master1
 		@(posedge bfm.clk) 
 		begin
@@ -304,8 +263,8 @@ endfunction: build_phase
     endtask: master1
       
 /********************************** Task for Master 0 ******************************/         
-      task master0(input_ports inputs_tk, tired outputs_tk);		// Self checker task for Master 0
-		tired predicted;
+      task master0(input_port inputs_tk, output_port outputs_tk);		// Self checker task for Master 0
+		output_port predicted;
         forever begin: self_checker_master0
         @(posedge bfm.clk) 
 		begin

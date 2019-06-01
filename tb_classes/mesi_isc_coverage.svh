@@ -1,16 +1,11 @@
 /********************************************************************************
 *
 * Authors: Vinitha Baddam, Monika Sinduja Mullapudi, Zerin Fatima
-* Reference: https://github.com/PrakashLuu/mesi_verification
-* Reference: https://github.com/shruti2611/EE382M_project/blob/master/mesi_fifo/mesi_isc_define.v
-* Reference: https://github.com/rdsalemi/uvmprimer/tree/master/16_Analysis_Ports_In_the_Testbench
-* Reference: https://opencores.org/projects/mesi_isc
-* Last Modified: March 6, 2019
+* Date: 5/31/2019
 *
 * Description:	This class checks stimulus coverage. 
-*				Command monitor provides inport port through the analysis port.
-********************************Change Log******************************************************* 
-* Srijana S. and Zeba K. R.			3/6/2019			Created
+*		Command monitor provides inport port through bfm.
+*
 ********************************************************************************/
 
 import mesi_isc_pkg::*;	
@@ -20,7 +15,7 @@ class coverage;
 	virtual mesi_isc_bfm bfm;
   
 	// input ports struct
-	input_ports inputs_cv;
+	input_port inputs_cv;
   
 	covergroup cover_inputs;
 		cmd3: coverpoint inputs_cv.mbus_cmd3_i{
@@ -118,7 +113,7 @@ class coverage;
 	// copy all inputs from the struct and 
 	// sample the coverage
 	task execute();
-		input_ports t;
+		input_port t;
 		t = bfm.inport; 
 		inputs_cv.mbus_cmd3_i 	= 	t.mbus_cmd3_i;
 		inputs_cv.mbus_cmd2_i 	= 	t.mbus_cmd2_i;
