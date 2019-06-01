@@ -1,18 +1,11 @@
 /********************************************************************************
 *
 * Authors: Vinitha Baddam, Monika Sinduja Mullapudi, Zerin Fatima
-* Reference: https://github.com/PrakashLuu/mesi_verification
-* Reference: https://github.com/shruti2611/EE382M_project/blob/master/mesi_fifo/mesi_isc_define.v
-* Reference: https://github.com/rdsalemi/uvmprimer/tree/master/16_Analysis_Ports_In_the_Testbench
-* Reference: https://opencores.org/projects/mesi_isc
-* Last Modified: March 3, 2019
+* Date: 5/31/2019
 *
-* Description:	This package defines all parameters, 'defines, structure to be used throughout this project
-********************************Change Log******************************************************* 
-* Srijana S & Zeba K.R.		3/3/2019			Created.
+* Description: This package defines all parameters, 'defines, structure to be used throughout this project
+*
 ********************************************************************************/
-`timescale 1ns / 1ps
-
 
 package mesi_isc_pkg;
  
@@ -82,41 +75,40 @@ package mesi_isc_pkg;
 	typedef struct{
 				//INTERNAL VARIABLES 
 				//connected to input of cpu 
-				//input to br given by driver 
-				logic   [DATA_WIDTH-1:0] mbus_data_rd;  		// Main bus data read
-				logic   [3:0]            mbus_ack;  	 		// Main bus3 acknowledge
-				integer					 cpu_id; 
+				logic   [DATA_WIDTH-1:0] mbus_data_rd;  	// Main bus data read
+				logic   [3:0]            mbus_ack;  	 	// Main bus3 acknowledge
+				integer			 cpu_id; 
 				logic   [3:0]            tb_ins_array;
 				logic   [3:0]            tb_ins_addr_array;
 				bit 					 reset; 
-				} cpu_ip_s; 									//used by the tester to pass it to driver 
+				} cpu_input; 	//used by the tester to pass it to bfm 
 				
 	typedef struct{	// inputs
-					logic [MBUS_CMD_WIDTH-1:0]	mbus_cmd3_i;
-					logic [MBUS_CMD_WIDTH-1:0] 	mbus_cmd2_i;
-					logic [MBUS_CMD_WIDTH-1:0] 	mbus_cmd1_i;
-					logic [MBUS_CMD_WIDTH-1:0] 	mbus_cmd0_i;
-					logic [ADDR_WIDTH-1:0] 		mbus_addr3_i;
-					logic [ADDR_WIDTH-1:0] 		mbus_addr2_i;
-					logic [ADDR_WIDTH-1:0] 		mbus_addr1_i;
-					logic [ADDR_WIDTH-1:0] 		mbus_addr0_i;
-					logic 						cbus_ack3_i;
-					logic 						cbus_ack2_i;
-					logic 						cbus_ack1_i;
-					logic 						cbus_ack0_i;
-      			  } input_ports;
+				logic [MBUS_CMD_WIDTH-1:0]	mbus_cmd3_i;
+				logic [MBUS_CMD_WIDTH-1:0] 	mbus_cmd2_i;
+				logic [MBUS_CMD_WIDTH-1:0] 	mbus_cmd1_i;
+				logic [MBUS_CMD_WIDTH-1:0] 	mbus_cmd0_i;
+				logic [ADDR_WIDTH-1:0] 		mbus_addr3_i;
+				logic [ADDR_WIDTH-1:0] 		mbus_addr2_i;
+				logic [ADDR_WIDTH-1:0] 		mbus_addr1_i;
+				logic [ADDR_WIDTH-1:0] 		mbus_addr0_i;
+				logic 				cbus_ack3_i;
+				logic 				cbus_ack2_i;
+				logic 				cbus_ack1_i;
+				logic 				cbus_ack0_i;
+      				} input_port;
 				  
 	typedef struct{ // Outputs
-					logic [ADDR_WIDTH-1:0] 		cbus_addr_o;
-					logic [CBUS_CMD_WIDTH-1:0] 	cbus_cmd3_o;
-					logic [CBUS_CMD_WIDTH-1:0] 	cbus_cmd2_o;
-					logic [CBUS_CMD_WIDTH-1:0] 	cbus_cmd1_o;
-					logic [CBUS_CMD_WIDTH-1:0] 	cbus_cmd0_o;
-					logic 						mbus_ack3_o;
-					logic 						mbus_ack2_o;
-					logic 						mbus_ack1_o;
-					logic 						mbus_ack0_o;
-				  } tired;
+				logic [ADDR_WIDTH-1:0] 		cbus_addr_o;
+				logic [CBUS_CMD_WIDTH-1:0] 	cbus_cmd3_o;
+				logic [CBUS_CMD_WIDTH-1:0] 	cbus_cmd2_o;
+				logic [CBUS_CMD_WIDTH-1:0] 	cbus_cmd1_o;
+				logic [CBUS_CMD_WIDTH-1:0] 	cbus_cmd0_o;
+				logic 				mbus_ack3_o;
+				logic 				mbus_ack2_o;
+				logic 				mbus_ack1_o;
+				logic 				mbus_ack0_o;
+				} output_port;
 
 /*`include "mesi_isc_coverage.svh"
 `include "mesi_isc_tester.svh"

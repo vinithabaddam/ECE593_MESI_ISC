@@ -1,17 +1,13 @@
 /********************************************************************************
-/********************************************************************************
 *
 * Authors: Vinitha Baddam, Monika Sinduja Mullapudi, Zerin Fatima
-* Reference: https://github.com/PrakashLuu/mesi_verification
-* Reference: https://github.com/shruti2611/EE382M_project/blob/master/mesi_fifo/mesi_isc_define.v
-* Reference: https://github.com/rdsalemi/uvmprimer/tree/master/16_Analysis_Ports_In_the_Testbench
-* Reference: https://opencores.org/projects/mesi_isc
-* Last Modified: March 3, 2019
+* Date: 5/31/2019
 *
-* Description:	This package defines all parameters, 'defines, structure to be used throughout this project
-********************************Change Log******************************************************* 
-* Srijana & Zeba	3/3/2019	Created top level module
+* Description: This is the top module for driving besign by passing BFM inputs and to instantiate other modules
+*
 ********************************************************************************/
+
+
 `include "testbench.svh"
 
 module top;

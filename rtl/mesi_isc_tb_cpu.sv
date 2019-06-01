@@ -1,20 +1,14 @@
 /********************************************************************************
 *
 * Authors: Vinitha Baddam, Monika Sinduja Mullapudi, Zerin Fatima
-* Reference: https://github.com/PrakashLuu/mesi_verification
-* Reference: https://github.com/shruti2611/EE382M_project/blob/master/mesi_fifo/mesi_isc_define.v
-* Reference: https://github.com/rdsalemi/uvmprimer/tree/master/16_Analysis_Ports_In_the_Testbench
-* Reference: https://opencores.org/projects/mesi_isc
-* Last Modified: March 3, 2019
+* Date: 5/31/2019
 *
-* Description:	This package defines all parameters, 'defines, structure to be used throughout this project
-********************************Change Log******************************************************* 
-* Srijana S& Zeba	3/3/2019	Coherence CPU with cache and memory lines
+* Description:	This is the main design midule
+*
 ********************************************************************************/
 
 import mesi_isc_pkg::*;
 `include "mesi_isc_pkg.sv"
-import uvm_pkg::*;
 
 module mesi_isc_tb_cpu
     (

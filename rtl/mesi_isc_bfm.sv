@@ -1,16 +1,14 @@
 /********************************************************************************
+*
 * Authors: Vinitha Baddam, Monika Sinduja Mullapudi, Zerin Fatima
-* Reference: https://github.com/PrakashLuu/mesi_verification
-* Reference: https://github.com/shruti2611/EE382M_project/blob/master/mesi_fifo/mesi_isc_define.v
-* Reference: https://github.com/rdsalemi/uvmprimer/tree/master/16_Analysis_Ports_In_the_Testbench
-* Last Modified: March 3, 2019
+* Date: 5/31/2019
 *
 * Description:	This bus functional module implements protocol to drive CPU. It will later be used 
-*					for moniitors and its subscribers- the scoreboard and the coverage
-********************************Change Log******************************************************* 
-* Srijana S. and Zeba K. R.			3/3/2019		Created
-********************************************************************************/
-`timescale 1ns / 1ps
+*		for moniitors, scoreboard and coverage
+*
+*********************************************************************************/
+
+//`timescale 1ns / 1ps
 
 `include "mesi_isc_command_monitor.svh"
 `include "mesi_isc_result_monitor.svh"
@@ -65,11 +63,11 @@ interface mesi_isc_bfm;
 	//clock block
 	initial 
 		begin
-			clk = 1;
+			clk = 0;
 			forever 
 				begin
-					#50;
-					clk = !clk; 
+					#10;
+					clk = ~clk; 
 				end 
 		end 
 	
@@ -104,7 +102,7 @@ interface mesi_isc_bfm;
 		end 
 
 	
-	task assign_ip(input cpu_ip_s cpu_ip);
+	task assign_ip(input cpu_input cpu_ip);
 			//inputs to CPU 
 
 		mbus_data_rd = cpu_ip.mbus_data_rd;
@@ -114,7 +112,7 @@ interface mesi_isc_bfm;
 	endtask
 	
 	//send INPUT to cpu3 
-	task send_ip_cpu(input cpu_ip_s cpu_ip);
+	task send_ip_cpu(input cpu_input cpu_ip);
 		
 		$display("cpu id = %d\n",cpu_ip.cpu_id);
 		//driving inputs to cpu task 
@@ -134,7 +132,7 @@ interface mesi_isc_bfm;
 	endtask: send_ip_cpu 
 	
 	
-	input_ports inport;
+	input_port inport;
 	//writing into the command monitor port
 	always @(posedge mbus_ack[3] or posedge mbus_ack[2] or posedge mbus_ack[1] or posedge mbus_ack[0])
 		begin : command_monitor_p
@@ -161,7 +159,7 @@ interface mesi_isc_bfm;
 			command_monitor_h.write_to_monitor(inport);								//write into the analysis port 
 		end : command_monitor_p 
 	
-	tired outport;
+	output_port outport;
 	//writing into result monitor port 
 	always @(cbus_addr)
 		begin: result_monitor_1 
@@ -180,7 +178,7 @@ interface mesi_isc_bfm;
 		end: result_monitor_1  
 
 	//task being called in the above task 
-	task assign_outport(input tired outport);
+	task assign_outport(input output_port outport);
 		//collect info of coherence addrs bus
 		outport.cbus_addr_o = cbus_addr;
 		//collect info of coherence cmnd bus
